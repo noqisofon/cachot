@@ -13,7 +13,7 @@
 #endif  /* def HAVE_SYS_TYPES_H */
 
 #ifdef HAVE_UNISTD_H
-#   include <unitsd.h>
+#   include <unistd.h>
 #endif  /* def HAVE_UNISTD_H */
 
 #ifdef HAVE_ASSERT_H

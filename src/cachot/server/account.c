@@ -1,5 +1,30 @@
+#include "config.h"
 
+#ifdef HAVE_STDDEF_H
+#   include <stddef.h>
+#endif  /* def HAVE_STDDEF_H */
 
+#ifdef HAVE_STDINT_H
+#   include <stdint.h>
+#endif  /* def HAVE_STDINT_H */
+
+#ifdef HAVE_SYS_TYPES_H
+#   include <sys/types.h>
+#endif  /* def HAVE_SYS_TYPES_H */
+
+#include <stdio.h>
+
+#ifdef HAVE_UNISTD_H
+#   include <unistd.h>
+#endif  /* def HAVE_UNISTD_H */
+
+#ifdef HAVE_ASSERT_H
+#   include <assert.h>
+#endif  /* def HAVE_ASSERT_H */
+
+#include "cachot/cachot.h"
+
+#include "cachot/server/account.h"
 
 /*!
  * アカウントリストの先頭。
@@ -7,7 +32,7 @@
 static CCHAccount    *The_accounts           = NULL;
 
 /*!
- *
+ * アカウントファイルを読み込んだことを示すフラグです。
  */
 static bool           The_accounts_loaded    = false;
 
@@ -18,15 +43,15 @@ void CCH_account_clear(void) {
 }
 
 void CCH_account_load_entries(void) {
-    char          filename[CCH_MAX_BUFSIZE];
-    char          line[CCH_VERY_LARGE_BUFSIZE];
+    SPHIO_Path      *filename                                    = SPH_io_path_new( The_settings.local_dir );
+    SPHStr          *line        /* CCH_VERY_LARGE_BUFSIZE */;
 
-    FILE         *output;
+    SPHIO_Handle    *output;
     
-    CCHAccount   *account;
-    CCHAccount   *last_account         = NULL;
+    CCHAccount      *account;
+    CCHAccount      *last_account         = NULL;
 
-    int32_t       field_quantity       = 0;
+    int32_t          field_quantity       = 0;
 
     if ( The_accounts != NULL ) {
         CCH_ERROR( _("%s(): Called when accounts has been set.\n"), __FUNCTION__ );
@@ -34,8 +59,8 @@ void CCH_account_load_entries(void) {
         return ;
     }
 
-    snprintf( filename, CCH_MAX_BUFSIZE, "%s/%s", The_settings.local_dir, CCH_ACCOUNT_FILENAME );
-    output = fopen( filename, "r" );
+    SPH_io_path_add( filename, CCH_ACCOUNT_FILENAME );
+    output = SPH_open( filename, SPHIO_FileMode_READ );
     if ( !output ) {
         char err_message[CCH_MAX_BUFSIZE];
         CCH_INFO( _("Waning: Unable to open %s [%s]"), filename, strerror_local( errno, err_message, sizeof(err_message) ) );
@@ -43,7 +68,7 @@ void CCH_account_load_entries(void) {
         return ;
     }
 
-    while ( fgets( line, CCH_VERY_LARGE_BUFSIZE, output ) ) {
+    while ( SPH_get_line( path, line, CCH_VERY_LARGE_BUFSIZE ) ) {
         char    *it;
         char    *fields[CCH_ACCOUNT_FIELDS_QUANTITY];
 
@@ -84,7 +109,7 @@ void CCH_account_load_entries(void) {
             account->character_quantity = 1;
 
             for ( it = fields[3]; *it != '\0'; ++ it ) {
-        }
+            }
         }
     }
 }
