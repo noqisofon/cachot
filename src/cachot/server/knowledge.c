@@ -31,7 +31,7 @@ CCH_API void CCH_knowledge_incremental(void) {
                 prev->_next          = current->_next;
             }
 
-            CCH_knowledge_free_player( current );
+            CCH_knowledge_player_free( current );
 
             return ;
         }
