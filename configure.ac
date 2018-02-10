@@ -33,8 +33,9 @@ AC_CHECK_FUNCS([memset])
 
 AC_CONFIG_FILES([Makefile
                  src/Makefile
-                 src/cachot/server/Makefile
                  src/cachot/Makefile
+                 src/cachot/domain/Makefile
+                 src/cachot/server/Makefile
                  src/sapphire/Makefile])
 
 AC_OUTPUT

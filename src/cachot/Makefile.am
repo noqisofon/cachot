@@ -1,2 +1,2 @@
 
-SUBDIRS = server
+SUBDIRS = domain server
