@@ -211,7 +211,7 @@ static void enter_map(CCHObject *moving_player, CCHMap *next_map, int32_t x, int
     CCH_object_set_enemy( moving_player, NULL );
 
     if ( moving_player->controller ) {
-        SPH_str_copy( moving_player->controller->map_level, next_map->path );
+        SPH_str_assign( moving_player->controller->map_level, next_map->path );
         moving_player->controller->count = 0;
     }
 
@@ -330,7 +330,7 @@ CCH_API void CCH_server_dispatch_event(void) {
 
         //
         if ( CCH_OBJECT_QUERY_FLAG( that, CCH_FLAG_FREED ) ) {
-            CCH_ERROR( _("BUG: %s(): Free object on list\n"), __FUNCTION__ );
+            CCH_ERROR( _("BUG: CCH_server_dispatch_event(): Free object on list\n") );
 
             that->speed = 0;
             CCH_object_update_speed( that );
@@ -348,7 +348,7 @@ CCH_API void CCH_server_dispatch_event(void) {
             SPHStringBuffer    *buffer;
             char               *diff;
 
-            CCH_ERROR( _("BUG: %s(): Remove object on list\n"), __FUNCTION__ );
+            CCH_ERROR( _("BUG: CCH_server_dispatch_event(): Remove object on list\n") );
             buffer = SPH_string_buffer_new();
 
             CCH_object_store_on( that, buffer );
@@ -362,8 +362,7 @@ CCH_API void CCH_server_dispatch_event(void) {
         }
 
         if ( !that->speed ) {
-            CCH_ERROR( _("BUG: %s(): Object %s has no speed, but is on active list\n"), __FUNCTION__,
-                       that->arch->name );
+            CCH_ERROR( _("BUG: CCH_server_dispatch_event(): Object %s has no speed, but is on active list\n"), that->arch->name );
 
             CCH_object_update_speed( that );
 
@@ -374,7 +373,7 @@ CCH_API void CCH_server_dispatch_event(void) {
              that->env == NULL &&
              that->name &&
              that->type != CCH_OBJECT_TYPE_MAP ) {
-            CCH_ERROR( _("BUG: %s(): Object without map or inventory is on active list: %s (%d)\n"), __FUNCTION__,
+            CCH_ERROR( _("BUG: CCH_server_dispatch_event(): Object without map or inventory is on active list: %s (%d)\n"),
                        that->name,
                        that->count );
 
@@ -385,7 +384,7 @@ CCH_API void CCH_server_dispatch_event(void) {
         }
 
         if ( that->map && that->map->in_memory != CCH_MAP_IN_MEMORY ) {
-            CCH_ERROR( _("BUG: %s(): Processing object on swapped out map: %s (%d), map=%s"), __FUNCTION__,
+            CCH_ERROR( _("BUG: CCH_server_dispatch_event(): Processing object on swapped out map: %s (%d), map=%s"),
                        that->name,
                        that->count,
                        that->map->arch );
