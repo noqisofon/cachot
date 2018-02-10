@@ -8,10 +8,63 @@
 #   include <stdint.h>
 #endif  /* def HAVE_STDINT_H */
 
-#include "cachot/cachot.h"
+#include <stdlib.h>
+
+#include "cachot/global.h"
 
 #include "cachot/domain/knowledge.h"
 
+
+typedef struct cch_knwoledge_type {
+    const SPHStr                    *type;
+} CCHKnowledgeType;
+
+typedef struct cch_knowledge_item {
+    SPHStr                           item_code;         //!< 内部的なアイテムコード。
+    CCHKnowledgeType                *handler;
+} CCHKnowledgeItem;
+
+typedef struct cch_knowledge_player {
+    SPHStr                           player_name;       //!< プレイヤー名。
+    CCHKnowledgeItem               **items;             //!< プレイヤーが知っているアイテム。
+    int32_t                          item_quantity;
+    int32_t                          item_allocated;
+    int32_t                          sent_up_to;
+
+    struct cch_knowledge_player     *_next;
+} CCHKnowledgePlayer;
+
+/*!
+ *
+ */
+static CCHKnowledgePlayer* The_knowledge_global = NULL;
+
+/*!
+ *
+ */
+static void knowledge_items_free(CCHKnowledgePlayer *a_player) {
+    for ( int32_t i = 0; i < a_player->item_quantity; ++ i ) {
+        CCHKnowledgeItem   *item = a_player->items[i];
+
+        SPH_str_free( item->item_code );
+        free( item );
+    }
+
+    free( a_player->items );
+
+    a_player->items          = NULL;
+    a_player->item_quantity  = 0;
+    a_player->item_allocated = 0;
+}
+
+/*!
+ *
+ */
+static void knowledge_player_free(CCHKnowledgePlayer *a_player) {
+    knowledge_items_free( a_player );
+    SPH_str_free( a_player->player_name );
+    free( a_player );
+}
 
 CCH_API void CCH_knowledge_incremental(void) {
     int32_t             last     = 0;
@@ -41,22 +94,22 @@ CCH_API void CCH_knowledge_incremental(void) {
                 prev->_next          = current->_next;
             }
 
-            CCH_knowledge_player_free( current );
+            knowledge_player_free( current );
 
             return ;
         }
 
-        if ( current->sent_up_to == -1 || current->sent_up_to == current->item_count ) {
+        if ( current->sent_up_to == -1 || current->sent_up_to == current->item_quantity ) {
             prev    = current;
             current = prev->_next;
 
             continue;
         }
 
-        last = SPH_MIN( current->sent_up_to + 50, current->item_count );
+        last = SPH_MIN( current->sent_up_to + 50, current->item_quantity );
         CCH_socket_list_init( &sockets );
         CCH_socket_list_append_string( &sockets, "addknowledge " );
-        for ( int32_t i = current->sent_up_to; i < last; +; i ) {
+        for ( int32_t i = current->sent_up_to; i < last; ++ i ) {
             item = current->items[i];
 
             buffer = SPH_string_buffer_new();

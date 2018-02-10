@@ -292,3 +292,4 @@ Makefile
 # build result files
 *.o
 *.lo
+*.la

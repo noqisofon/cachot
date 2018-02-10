@@ -26,11 +26,7 @@
 
 #include "cachot/utils/logging.h"
 
-#include "cachot/domain/object.h"
-#include "cachot/domain/time.h"
-#include "cachot/domain/player.h"
-#include "cachot/domain/world.h"
-#include "cachot/domain/map.h"
+#include "cachot/global.h"
 
 #include "cachot/server/init.h"
 #include "cachot/server/info.h"

@@ -2,6 +2,7 @@
 
 #include "sapphire/internal.h"
 #include "sapphire/allocation.h"
+#include "sapphire/numeric.h"
 #include "sapphire/boolean.h"
 #include "sapphire/str.h"
 #include "sapphire/string_buffer.h"

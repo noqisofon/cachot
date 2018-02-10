@@ -12,6 +12,11 @@ typedef struct cch_settings {
     CCHLogLevel                debug;
 
     const SPHStr               local_dir;
+
+    SPHStr                     emergency_map_name;
+
+    int32_t                    emergency_x;
+    int32_t                    emergency_y;
     
 } CCHSettings;
 

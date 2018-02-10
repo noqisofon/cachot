@@ -1,5 +1,10 @@
 #pragma once
 
+/*!
+ *
+ */
+#define    CCH_MAX_SOCKET_BUFSIZE   (2 + 65535 + 1)
+
 
 enum cch_ndi_colors {
     CCH_NDI_BLACK      =  0,

@@ -54,3 +54,15 @@ SPH_API size_t           SPH_str_length(SPHStr self);
  *
  */
 SPH_API SPHOrder         SPH_str_compare(SPHStr self, SPHStr other);
+
+
+/*!
+ *
+ */
+SPH_API SPHBool          SPH_str_equals(SPHStr self, SPHStr other);
+
+
+/*!
+ *
+ */
+SPH_API void             SPH_str_free(SPHStr self);
