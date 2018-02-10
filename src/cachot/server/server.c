@@ -21,22 +21,26 @@
 #endif  /* def HAVE_ASSERT_H */
 
 #include "cachot/cachot.h"
+#include "cachot/client.h"
+#include "cachot/version.h"
+
+#include "cachot/utils/logging.h"
 
 #include "cachot/domain/object.h"
 #include "cachot/domain/time.h"
 #include "cachot/domain/player.h"
 #include "cachot/domain/world.h"
-
-#include "cachot/utils/logging.h"
+#include "cachot/domain/map.h"
 
 #include "cachot/server/init.h"
+#include "cachot/server/info.h"
 #include "cachot/server/loop.h"
 #include "cachot/server/plugin.h"
 
 #include "cachot/server/server.h"
 
 
-static const char WeekDays[7][] = {
+static const SPHStr WeekDays[7] = {
     _("Sun"),
     _("Mon"),
     _("Tue"),
@@ -63,7 +67,7 @@ static void enter_map(CCHObject *moving_player, CCHMap *next_map, int32_t x, int
 /*!
  *
  */
-static char *clean_path(const char *filename, char *new_path, size_t size);
+static SPHStr clean_path(const SPHStr filename, SPHStr new_path, size_t size);
 
 /*!
  * 
@@ -72,22 +76,26 @@ static void perform_specials(void);
 
 
 CCH_API void CCH_server_show_version(CCHObject *that) {
-    CCH_info_draw_ext_format( CCH_NDI_UNIQUE, 0, that,
+    CCH_info_draw_ext_format( CCH_NDI_UNIQUE, 0,
+                              that,
                               CCH_MSG_TYPE_ADMIN, CCH_MSG_TYPE_ADMIN_VERSION,
                               _("This is Cachot v%s"), CCH_FULL_VERSION );
-    CCH_info_draw_ext( CCH_NDI_UNIQUE, 0, that,
+    CCH_info_draw_ext( CCH_NDI_UNIQUE, 0,
+                       that,
                        CCH_MSG_TYPE_ADMIN, CCH_MSG_TYPE_ADMIN_VERSION,
                        _("The authors can be reached at ??????????????????????????????????????"));
 }
 
 
 CCH_API void CCH_server_start_info(CCHObject *that) {
-    CCH_info_draw_ext_format( CCH_NDI_UNIQUE, 0, that,
+    CCH_info_draw_ext_format( CCH_NDI_UNIQUE, 0,
+                              that,
                               CCH_MSG_TYPE_ADMIN, CCH_MSG_TYPE_ADMIN_LOGIN,
                               _("Welcome to Cachot, v%s\nPress `?` for help\n"),
                               CCH_VERSION );
 
-    CCH_info_draw_ext_format( CCH_NDI_UNIQUE | CCH_NDI_ALL | NDI_OK_ORANGE, 5, that,
+    CCH_info_draw_ext_format( CCH_NDI_UNIQUE | CCH_NDI_ALL | CCH_NDI_DK_ORANGE, 5,
+                              that,
                               CCH_MSG_TYPE_ADMIN, CCH_MSG_TYPE_ADMIN_PLAYER,
                               _("$s entered the game."),
                               that->name );
@@ -95,39 +103,38 @@ CCH_API void CCH_server_start_info(CCHObject *that) {
 
 #define SPH_PICK_ARRAY(_ary_, _len_)      _ary_[CCH_RANDOM() % (int32_t)_len_]
 
-CCH_API const char* CCH_server_crypt_string(const char *str, const char *salt) {
+CCH_API const SPHStr CCH_server_crypt_string(const SPHStr str, const SPHStr salt) {
 #if defined(CCH_PLATFORM_IS_WIN32) || ( defined(CCH_PLATFORM_IS_FREEBSD) && !defined(HAVE_LIBDES) )
     return str;
 #else  /* defined(CCH_PLATFORM_IS_WIN32) || ( defined(CCH_PLATFORM_IS_FREEBSD) && !defined(HAVE_LIBDES) ) */
-    static const char *glyph_table        = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789./";
-    static size_t      glyph_table_length = strlen( glyph_table );
+    static const SPHStr glyph_table        = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789./";
+
+    size_t              glyph_table_length = SPH_str_length( glyph_table );
 
     char cs[2];
 
     if ( salt == NULL ) {
-        cs[0] = CCH_PICK_ARRAY( glyph_table, glyph_table_length );
-        cs[1] = CCH_PICK_ARRAY( glyph_table, glyph_table_length );
+        cs[0] = SPH_PICK_ARRAY( glyph_table, glyph_table_length );
+        cs[1] = SPH_PICK_ARRAY( glyph_table, glyph_table_length );
     } else {
         cs[0] = salt[0];
         cs[1] = salt[1];
     }
 #   if defined(HAVE_LIBDES)
-    return (char *)des_crypt( str, cs );
+    return (SPHStr )des_crypt( str, cs );
 #   else
-    return (char *)crypt( str, cs );
+    return (SPHStr )crypt( str, cs );
 #   endif  /* defined(HAVE_LIBDES) */
 #endif  
 }
 
-CCH_API int32_t CCH_server_check_password(const SPHStr *typed, const SPHStr *crypted) {
+CCH_API int32_t CCH_server_check_password(const SPHStr typed, const SPHStr crypted) {
     if ( SPH_str_length( crypted ) == 0 ) {
-
         return SPH_str_length( typed ) == 0
-            ? 1
-            : 0;
+            ? SPHOrder_More
+            : SPHOrder_Same;
     }
     return SPH_str_compare( CCH_server_crypt_string( typed, crypted ), crypted );
-    
 }
 
 static void enter_map(CCHObject *moving_player, CCHMap *next_map, int32_t x, int32_t y) {
@@ -274,8 +281,8 @@ CCH_API void CCH_map_set_timeout(CCHMap *a_map) {
 #endif  /* CCH_MAP_MAX_TIMEOUT */
 }
 
-static char *clean_path(const char *filename, char *new_path, size_t size) {
-    char *it;
+static SPHStr clean_path(const SPHStr filename, SPHStr new_path, size_t size) {
+    SPHStr it;
 
     snprintf( new_path, size, "%s", filename );
     for ( it = new_path; *it != '\0'; ++ it ) {
@@ -414,7 +421,7 @@ CCH_API void CCH_server_dispatch_event(void) {
             }
         }
 
-        if ( The_settings.casting_time == TRUE && that->casting_time > 0 ) {
+        if ( The_settings.casting_time == true && that->casting_time > 0 ) {
             -- that->casting_time;
         }
 
@@ -449,7 +456,7 @@ static void perform_specials(void) {
     
 }
 
-CCH_API int32_t CCH_server_main(int32_t argc, char **argv) {
+CCH_API int32_t CCH_server_main(int32_t argc, SPHStr *argv) {
 #ifdef CCH_PLATFORM_ON_WIN32
     SPH_set_fmode( SPH_O_BINARY );
     is_running = true;

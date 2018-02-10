@@ -1,6 +1,16 @@
+#include "config.h"
 
+#ifdef HAVE_STDDEF_H
+#   include <stddef.h>
+#endif  /* def HAVE_STDDEF_H */
 
+#ifdef HAVE_STDINT_H
+#   include <stdint.h>
+#endif  /* def HAVE_STDINT_H */
 
+#include "cachot/cachot.h"
+
+#include "cachot/domain/knowledge.h"
 
 
 CCH_API void CCH_knowledge_incremental(void) {

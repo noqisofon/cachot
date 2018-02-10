@@ -288,3 +288,7 @@ include/stamp-h1
 # automake files
 Makefile.in
 Makefile
+
+# build result files
+*.o
+*.lo

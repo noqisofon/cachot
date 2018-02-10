@@ -1,5 +1,7 @@
 #pragma once
 
+#include "cachot/server/defines.h"
+
 
 /*!
  * \def CCH_ACCOUNT_FIELDS_QUANTITY
@@ -15,7 +17,12 @@
  */
 #define    CCH_ACCOUNT_FILENAME          "accounts"
 
-
+/*!
+ * \def CCH_MAX_CHARACTERS_PER_ACCOUNT
+ *
+ * 1 つのアカウントが何人のキャラクターを持てるかを表します。
+ */
+#define    CCH_MAX_CHARACTERS_PER_ACCOUNT (CCH_MAX_VERY_BIG_BUFSIZE - 150) / (CCH_MAX_NAME_SIZE + 1)
 
 typedef struct cch_account {
     char               *name;                  //!< アカウント名。

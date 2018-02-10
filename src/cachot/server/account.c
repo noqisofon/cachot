@@ -34,7 +34,7 @@ static CCHAccount    *The_accounts           = NULL;
 /*!
  * アカウントファイルを読み込んだことを示すフラグです。
  */
-static bool           The_accounts_loaded    = false;
+static SPHBool        The_accounts_loaded    = false;
 
 
 CCH_API void CCH_account_clear(void) {
@@ -60,7 +60,7 @@ CCH_API void CCH_account_load_entries(void) {
     filename = SPH_io_path_new( The_settings.local_dir );
     SPH_io_path_add( filename, CCH_ACCOUNT_FILENAME );
 
-    SPHIO_Handle    *output = SPH_open( filename, SPHIO_FileMode_READ );
+    SPHIO_Handle    *output = SPH_open( SPH_io_path_to_str( filename ), SPHIO_FileMode_READ );
     if ( !output ) {
         char err_message[CCH_MAX_BUFSIZE];
 
@@ -74,15 +74,15 @@ CCH_API void CCH_account_load_entries(void) {
     }
 
     int32_t          field_quantity       = 0;
-    SPHStr           line                 = {0};
+    char             line[CCH_MAX_VERY_BIG_BUFSIZE];
     
     CCHAccount      *account              = NULL;
     CCHAccount      *last_account         = NULL;
 
-    SPH_string_init_with_size( &line, CCH_VERY_LARGE_BUFSIZE );
+    SPH_str_init_with_size( line, CCH_MAX_VERY_BIG_BUFSIZE );
 
-    while ( SPH_get_line( output, &line ) ) {
-        SPHStrIterator    *it;
+    while ( SPH_get_line( output, line, CCH_MAX_VERY_BIG_BUFSIZE ) ) {
+        SPHStrIterator     it;
         char              *fields[CCH_ACCOUNT_FIELDS_QUANTITY];
 
         if ( line[0] == COMMENT ) {
@@ -90,21 +90,23 @@ CCH_API void CCH_account_load_entries(void) {
             continue;
         }
 
-        it = SPH_string_find( line, NEWLINE );
+        it = SPH_str_find( line, NEWLINE );
         if ( it ) {
             // 改行を '\0'(文字列の終わり)で上書きします。
             *it = STRING_END;
         }
 
-        field_quantity = SPH_string_split( line, fields, CCH_ACCOUNT_FIELDS_QUANTITY, FIELD_SEPARATOR );
+        field_quantity = SPH_str_split( line,
+                                        fields, CCH_ACCOUNT_FIELDS_QUANTITY,
+                                        FIELD_SEPARATOR );
 
         account                = SPH_NEW(CCHAccount);
-        account->name          = SPH_string_clone( fields[0] );
-        account->password      = SPH_string_clone( fields[1] );
-        account->last_login_at = SPH_string_to_unsiged( fields[2], 10 );
+        account->name          = SPH_str_clone( fields[0] );
+        account->password      = SPH_str_clone( fields[1] );
+        account->last_login_at = SPH_str_to_uint64( fields[2], 10 );
 
         if ( field_quantity > 4 ) {
-            account->created_at = SPH_string_to_uint32( fields[4], 10 );
+            account->created_at = SPH_str_to_uint32( fields[4], 10 );
         } else {
             account->created_at = account->last_login_at;
         }
@@ -113,7 +115,8 @@ CCH_API void CCH_account_load_entries(void) {
 
         if ( fields[3][0] == STRING_END ) {
             account->character_quantity = 0;
-            for ( int32_t i = 0 i <= CCH_MAX_CHARACTERS_PER_ACCOUNT; ++ i ) {
+
+            for ( int32_t i = 0; i <= CCH_MAX_CHARACTERS_PER_ACCOUNT; ++ i ) {
                 account->character_names[i] = NULL;
             }
         } else {
@@ -127,13 +130,13 @@ CCH_API void CCH_account_load_entries(void) {
                 }
             }
 
-            result = SPH_string_split( fields[3],
-                                       account->character_names,
-                                       account->character_quantity,
-                                       CHARACTERNAME_SEPARATOR );
+            result = SPH_str_split( fields[3],
+                                    account->character_names,
+                                    account->character_quantity,
+                                    CHARACTERNAME_SEPARATOR );
 
             if ( result != account->character_quantity ) {
-                CCH_ERROR( _("CCH_account_load_entries: SPH_string_split() found different character quantity: %d != %d\n"),
+                CCH_ERROR( _("CCH_account_load_entries: SPH_str_split() found different character quantity: %d != %d\n"),
                            result,
                            account->character_quantity );
             }
@@ -154,7 +157,7 @@ CCH_API void CCH_account_load_entries(void) {
                 }
                 // string#clone だと必要ない SPHStr インスタンスが 1 つ余計に出そう。
                 // string#assign なら同じポインタの場合は何もしないか、中身の生文字列をコピーするだけ。
-                SPH_string_assign( account->character_names[i], account->character_names[i] );
+                SPH_str_assign( account->character_names[i], account->character_names[i] );
             }
 
             // 残りはしっかり NULL で塗りつぶす。
