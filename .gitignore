@@ -261,3 +261,30 @@ paket-files/
 # Python Tools for Visual Studio (PTVS)
 __pycache__/
 *.pyc
+
+# autotools files
+configure
+config.status
+build/
+!build/.gitkeep
+!build/macro/.gitkeep
+
+# autotools cache directories
+.deps/
+.libs/
+autom4te.cache/
+
+# aclocal
+aclocal.m4
+
+# libtool files
+libtool
+
+# autoheader files
+include/config.h.in
+include/config.h
+include/stamp-h1
+
+# automake files
+Makefile.in
+Makefile
