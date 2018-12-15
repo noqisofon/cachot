@@ -1,0 +1,6 @@
+#!/usr/bin/bash
+# -*- mode: shell-script; coding: utf-8; -*-
+
+libtoolize --copy
+automake --copy --add-missing
+autoreconf
