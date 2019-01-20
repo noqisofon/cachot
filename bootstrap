@@ -1,6 +1,8 @@
 #!/usr/bin/bash
 # -*- mode: shell-script; coding: utf-8; -*-
 
+aclocal
 libtoolize --copy
+autoheader
 automake --copy --add-missing
 autoreconf
