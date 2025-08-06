@@ -1,8 +1,8 @@
 #                                               -*- Autoconf -*-
 # Process this file with autoconf to produce a configure script.
 
-AC_PREREQ([2.69])
-AC_INIT(cachot, 0.0.1, ned.rihine@gmai.com)
+AC_PREREQ([2.72])
+AC_INIT([cachot],[0.0.1],[ned.rihine@gmail.com])
 AC_CONFIG_AUX_DIR([build])
 AC_CONFIG_MACRO_DIR([build/macros])
 AC_CONFIG_SRCDIR([src/cachot/server/main.c])
@@ -12,7 +12,7 @@ LT_INIT
 
 # Checks for programs.
 AC_PROG_CC
-AC_PROG_LIBTOOL
+LT_INIT
 
 # Checks for libraries.
 
