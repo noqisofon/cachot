@@ -10,6 +10,8 @@
 
 #include <stdlib.h>
 
+#include "cachot/domain/object.h"
+#include "cachot/domain/player.h"
 #include "cachot/global.h"
 
 #include "cachot/domain/knowledge.h"
