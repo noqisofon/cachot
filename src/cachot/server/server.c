@@ -71,6 +71,10 @@ static SPHStr clean_path(const SPHStr filename, SPHStr new_path, size_t size);
 static void perform_specials(void);
 
 
+const int Free_area_x[] = {0, -1, 1, 0, 0, -1, 1, -1, 1};
+const int Free_area_y[] = {0, 0, 0, -1, 1, -1, -1, 1, 1};
+
+
 CCH_API void CCH_server_show_version(CCHObject *that) {
     CCH_info_draw_ext_format( CCH_NDI_UNIQUE, 0,
                               that,
@@ -174,9 +178,9 @@ static void enter_map(CCHObject *moving_player, CCHMap *next_map, int32_t x, int
                                                next_map,
                                                x, y,
                                                1, CCH_SIZE_OFF_FREE1 + 1 );
-        if ( i != CHH_NOT_FOUND ) {
+        if ( i != CCH_NOT_FOUND ) {
             x += Free_area_x[i];
-            y += Free_area_x[i];
+            y += Free_area_y[i];
         } else {
             CCH_INFO( _("enter_map(): Could not find free spot for player - will dump on top of object {%s => (%d, %d)}"), next_map->path, x, y );
         }
@@ -211,7 +215,7 @@ static void enter_map(CCHObject *moving_player, CCHMap *next_map, int32_t x, int
     CCH_object_set_enemy( moving_player, NULL );
 
     if ( moving_player->controller ) {
-        SPH_str_assign( moving_player->controller->map_level, next_map->path );
+        SPH_str_assign( moving_player->controller->maplevel, next_map->path );
         moving_player->controller->count = 0;
     }
 
@@ -223,7 +227,7 @@ static void enter_map(CCHObject *moving_player, CCHMap *next_map, int32_t x, int
                                                1,
                                                CCH_SIZE_OFF_FREE1 );
         CCH_object_remove( moving_player->controller->ranges[CCH_RANGE_GOREM] );
-        if ( i == CHH_NOT_FOUND ) {
+        if ( i == CCH_NOT_FOUND ) {
             CCH_object_remove_friendly_object( moving_player->controller->ranges[CCH_RANGE_GOREM] );
 
             CCH_object_free_drop_inventory( moving_player->controller->ranges[CCH_RANGE_GOREM] );
