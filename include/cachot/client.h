@@ -48,6 +48,9 @@ enum cch_message_type {
     CCH_MSG_TYPE_BOOK      = 1,
     CCH_MSG_TYPE_CARD      = 2,
     CCH_MSG_TYPE_PAPER     = 3,
+
+    CCH_MSG_TYPE_COMMAND,
+    CCH_MSG_TYPE_COMMAND_FAILURE,
     
     CCH_MSG_TYPE_ADMIN     = 8
 };

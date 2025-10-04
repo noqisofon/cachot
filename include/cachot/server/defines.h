@@ -21,3 +21,13 @@
  * 
  */
 #define    CCH_MAX_HUGE_BUFSIZE        4096
+
+/*!
+ *
+ */
+#define    CCH_SIZE_OFF_FREE1          8
+
+/*!
+ *
+ */
+#define    CCH_NOT_FOUND               -1
