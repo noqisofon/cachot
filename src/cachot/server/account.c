@@ -1,26 +1,26 @@
 #include "config.h"
 
 #ifdef HAVE_STDDEF_H
-#   include <stddef.h>
-#endif  /* def HAVE_STDDEF_H */
+#    include <stddef.h>
+#endif /* def HAVE_STDDEF_H */
 
 #ifdef HAVE_STDINT_H
-#   include <stdint.h>
-#endif  /* def HAVE_STDINT_H */
+#    include <stdint.h>
+#endif /* def HAVE_STDINT_H */
 
 #ifdef HAVE_SYS_TYPES_H
-#   include <sys/types.h>
-#endif  /* def HAVE_SYS_TYPES_H */
+#    include <sys/types.h>
+#endif /* def HAVE_SYS_TYPES_H */
 
 #include <stdio.h>
 
 #ifdef HAVE_UNISTD_H
-#   include <unistd.h>
-#endif  /* def HAVE_UNISTD_H */
+#    include <unistd.h>
+#endif /* def HAVE_UNISTD_H */
 
 #ifdef HAVE_ASSERT_H
-#   include <assert.h>
-#endif  /* def HAVE_ASSERT_H */
+#    include <assert.h>
+#endif /* def HAVE_ASSERT_H */
 
 #include "cachot/cachot.h"
 
@@ -29,15 +29,14 @@
 /*!
  * アカウントリストの先頭。
  */
-static CCHAccount    *The_accounts           = NULL;
+static CCHAccount *The_accounts        = NULL;
 
 /*!
  * アカウントファイルを読み込んだことを示すフラグです。
  */
-static SPHBool        The_accounts_loaded    = false;
+static SPHBool     The_accounts_loaded = false;
 
-
-CCH_API void CCH_account_clear(void) {
+CCH_API void       CCH_account_clear( void ) {
     The_accounts        = NULL;
     The_accounts_loaded = false;
 }
@@ -48,42 +47,42 @@ CCH_API void CCH_account_clear(void) {
 #define FIELD_SEPARATOR         ';'
 #define CHARACTERNAME_SEPARATOR ';'
 
-CCH_API void CCH_account_load_entries(void) {
-    SPHIO_Path      *filename = NULL;
+CCH_API void CCH_account_load_entries( void ) {
+    SPHIO_Path *filename = NULL;
 
     if ( The_accounts != NULL ) {
-        CCH_ERROR( _("CCH_account_load_entries: Called when accounts has been set.\n") );
+        CCH_ERROR( _( "CCH_account_load_entries: Called when accounts has been set.\n" ) );
 
-        return ;
+        return;
     }
 
     filename = SPH_io_path_new( The_settings.local_dir );
     SPH_io_path_add( filename, CCH_ACCOUNT_FILENAME );
 
-    SPHIO_Handle    *output = SPH_open( SPH_io_path_to_str( filename ), SPHIO_FileMode_READ );
+    SPHIO_Handle *output = SPH_open( SPH_io_path_to_str( filename ), SPHIO_FileMode_READ );
     if ( !output ) {
         char err_message[CCH_MAX_BUFSIZE];
 
-        CCH_INFO( _("Waning: Unable to open %s [%s]"),
+        CCH_INFO( _( "Waning: Unable to open %s [%s]" ),
                   SPH_io_path_to_str( filename ),
-                  SPH_error_to_string( errno, err_message, sizeof(err_message) ) );
+                  SPH_error_to_string( errno, err_message, sizeof( err_message ) ) );
 
         SPH_io_path_free( filename );
 
-        return ;
+        return;
     }
 
-    int32_t          field_quantity       = 0;
-    char             line[CCH_MAX_VERY_BIG_BUFSIZE];
-    
-    CCHAccount      *account              = NULL;
-    CCHAccount      *last_account         = NULL;
+    int32_t     field_quantity = 0;
+    char        line[CCH_MAX_VERY_BIG_BUFSIZE];
+
+    CCHAccount *account      = NULL;
+    CCHAccount *last_account = NULL;
 
     SPH_str_init_with_size( line, CCH_MAX_VERY_BIG_BUFSIZE );
 
     while ( SPH_get_line( output, line, CCH_MAX_VERY_BIG_BUFSIZE ) ) {
-        SPHStrIterator     it;
-        char              *fields[CCH_ACCOUNT_FIELDS_QUANTITY];
+        SPHStrIterator it;
+        char          *fields[CCH_ACCOUNT_FIELDS_QUANTITY];
 
         if ( line[0] == COMMENT ) {
             // '#' はコメントなので、無視します。
@@ -96,11 +95,9 @@ CCH_API void CCH_account_load_entries(void) {
             *it = STRING_END;
         }
 
-        field_quantity = SPH_str_split( line,
-                                        fields, CCH_ACCOUNT_FIELDS_QUANTITY,
-                                        FIELD_SEPARATOR );
+        field_quantity         = SPH_str_split( line, fields, CCH_ACCOUNT_FIELDS_QUANTITY, FIELD_SEPARATOR );
 
-        account                = SPH_NEW(CCHAccount);
+        account                = SPH_NEW( CCHAccount );
         account->name          = SPH_str_clone( fields[0] );
         account->password      = SPH_str_clone( fields[1] );
         account->last_login_at = SPH_str_to_uint64( fields[2], 10 );
@@ -111,22 +108,22 @@ CCH_API void CCH_account_load_entries(void) {
             account->created_at = account->last_login_at;
         }
 
-        account->_next         = NULL;
+        account->_next = NULL;
 
         if ( fields[3][0] == STRING_END ) {
             account->character_quantity = 0;
 
-            for ( int32_t i = 0; i <= CCH_MAX_CHARACTERS_PER_ACCOUNT; ++ i ) {
+            for ( int32_t i = 0; i <= CCH_MAX_CHARACTERS_PER_ACCOUNT; ++i ) {
                 account->character_names[i] = NULL;
             }
         } else {
-            int32_t  result = 0;
+            int32_t result              = 0;
 
             account->character_quantity = 1;
 
-            for ( it = fields[3]; *it != STRING_END; ++ it ) {
+            for ( it = fields[3]; *it != STRING_END; ++it ) {
                 if ( *it == CHARACTERNAME_SEPARATOR ) {
-                    ++ account->character_quantity;
+                    ++account->character_quantity;
                 }
             }
 
@@ -136,20 +133,21 @@ CCH_API void CCH_account_load_entries(void) {
                                     CHARACTERNAME_SEPARATOR );
 
             if ( result != account->character_quantity ) {
-                CCH_ERROR( _("CCH_account_load_entries: SPH_str_split() found different character quantity: %d != %d\n"),
-                           result,
-                           account->character_quantity );
+                CCH_ERROR(
+                    _( "CCH_account_load_entries: SPH_str_split() found different character quantity: %d != %d\n" ),
+                    result,
+                    account->character_quantity );
             }
 
             if ( account->character_quantity > CCH_MAX_CHARACTERS_PER_ACCOUNT ) {
-                CCH_ERROR( _("CCH_account_load_entries: Too many characters set for account %s - truncating to %d\n"),
+                CCH_ERROR( _( "CCH_account_load_entries: Too many characters set for account %s - truncating to %d\n" ),
                            account->name,
                            CCH_MAX_CHARACTERS_PER_ACCOUNT );
 
                 account->character_quantity = CCH_MAX_CHARACTERS_PER_ACCOUNT;
             }
 
-            for ( int32_t i = 0; i < account->character_quantity; ++ i ) {
+            for ( int32_t i = 0; i < account->character_quantity; ++i ) {
                 if ( account->character_names[i] == NULL ) {
                     account->character_quantity = i;
 
@@ -161,7 +159,7 @@ CCH_API void CCH_account_load_entries(void) {
             }
 
             // 残りはしっかり NULL で塗りつぶす。
-            for ( int32_t i = account->character_quantity; i <= CCH_MAX_CHARACTERS_PER_ACCOUNT; ++ i ) {
+            for ( int32_t i = account->character_quantity; i <= CCH_MAX_CHARACTERS_PER_ACCOUNT; ++i ) {
                 account->character_names[i] = NULL;
             }
         }
@@ -181,12 +179,13 @@ CCH_API void CCH_account_load_entries(void) {
     The_accounts_loaded = true;
 }
 
-static void account_write_entry(SPHIO_Handle *input, const CCHAccount *an_account) {
-    SPH_io_handle_printf( input, "%s:%s:u",
+static void account_write_entry( SPHIO_Handle *input, const CCHAccount *an_account ) {
+    SPH_io_handle_printf( input,
+                          "%s:%s:u",
                           an_account->name,
                           an_account->password,
                           (uint32_t)an_account->last_login_at );
-    for ( int32_t i = 0; i < an_account->character_quantity; ++ i ) {
+    for ( int32_t i = 0; i < an_account->character_quantity; ++i ) {
         if ( i == 0 ) {
             SPH_io_handle_printf( input, "%s", an_account->character_names[i] );
         } else {
@@ -196,10 +195,9 @@ static void account_write_entry(SPHIO_Handle *input, const CCHAccount *an_accoun
     SPH_io_handle_printf( input, ":%u\n", (uint32_t)an_account->created_at );
 }
 
-
-CCH_API void CCH_account_save(void) {
+CCH_API void CCH_account_save( void ) {
     if ( !The_accounts_loaded ) {
 
-        return ;
+        return;
     }
 }

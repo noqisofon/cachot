@@ -25,13 +25,12 @@
 /* #include "cachot/domain/recipe.h" */
 /* #include "cachot/domain/spells.h" */
 
-
 /* extern CCHFace         *The_faces; */
 
 /*!
- * 
+ *
  */
-extern CCHPlayer       *The_first_player;
+extern CCHPlayer *The_first_player;
 
 /* /\*! */
 /*  * */
