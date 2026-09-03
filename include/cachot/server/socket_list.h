@@ -1,5 +1,12 @@
 #pragma once
 
+#include <stdint.h>
+#include <stddef.h>
+
+#include "cachot/server/internal.h"
+#include "cachot/client.h"
+#include "sapphire/str.h"
+
 typedef struct cch_socket_list {
 #ifdef CACHOT_CLIENT_TYPES_H
     size_t      length;

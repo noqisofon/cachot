@@ -50,3 +50,11 @@ CCH_API void CCH_player_enter_spawn_point(CCHObject *a_player) {
 
     CCH_object_free2( tmp, CCH_OBJECT_FREETYPE_NO_DESTROY_CALLBACK );
 }
+
+CCH_API void CCH_player_dispatch1( void ) {
+    // プレイヤーの入力処理はまだ実装されていません。
+}
+
+CCH_API void CCH_player_dispatch2( void ) {
+    // プレイヤーへの出力処理はまだ実装されていません。
+}

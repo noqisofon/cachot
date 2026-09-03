@@ -1,5 +1,9 @@
 #pragma once
 
+#include "sapphire/internal.h"
+#include "sapphire/boolean.h"
+#include "sapphire/str.h"
+#include "sapphire/io.h"
 
 /*!
  *

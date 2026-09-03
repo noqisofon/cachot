@@ -293,3 +293,4 @@ Makefile
 *.o
 *.lo
 *.la
+src/cachot/server/cachot-server

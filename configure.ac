@@ -15,6 +15,7 @@ AC_PROG_CC
 LT_INIT
 
 # Checks for libraries.
+AC_SEARCH_LIBS([crypt], [crypt])
 
 # Checks for header files.
 AC_CHECK_HEADER_STDBOOL
@@ -34,6 +35,7 @@ AC_CHECK_FUNCS([memset])
 AC_CONFIG_FILES([Makefile
                  src/Makefile
                  src/cachot/Makefile
+                 src/cachot/utils/Makefile
                  src/cachot/domain/Makefile
                  src/cachot/server/Makefile
                  src/sapphire/Makefile])
