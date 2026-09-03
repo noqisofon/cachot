@@ -17,7 +17,9 @@ typedef struct cch_settings {
 
     int32_t                    emergency_x;
     int32_t                    emergency_y;
-    
+
+    SPHBool                    casting_time;
+
 } CCHSettings;
 
 /*!

@@ -1,2 +1,2 @@
 
-SUBDIRS = cachot sapphire
+SUBDIRS = sapphire cachot

@@ -1,7 +1,7 @@
 #                                               -*- Autoconf -*-
 # Process this file with autoconf to produce a configure script.
 
-AC_PREREQ([2.72])
+AC_PREREQ([2.71])
 AC_INIT([cachot],[0.0.1],[ned.rihine@gmail.com])
 AC_CONFIG_AUX_DIR([build])
 AC_CONFIG_MACRO_DIR([build/macros])
@@ -15,6 +15,7 @@ AC_PROG_CC
 LT_INIT
 
 # Checks for libraries.
+AC_SEARCH_LIBS([crypt], [crypt])
 
 # Checks for header files.
 AC_CHECK_HEADER_STDBOOL
@@ -34,6 +35,7 @@ AC_CHECK_FUNCS([memset])
 AC_CONFIG_FILES([Makefile
                  src/Makefile
                  src/cachot/Makefile
+                 src/cachot/utils/Makefile
                  src/cachot/domain/Makefile
                  src/cachot/server/Makefile
                  src/sapphire/Makefile])

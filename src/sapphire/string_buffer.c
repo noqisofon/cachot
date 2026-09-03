@@ -1,8 +1,11 @@
 #include <stdlib.h>
 #include <stdarg.h>
 #include <string.h>
+#include <stdio.h>
 
 #include "sapphire/string_buffer.h"
+#include "sapphire/allocation.h"
+#include "sapphire/error.h"
 
 
 #define DEFAULT_BUFFER_SIZE 256
@@ -51,6 +54,8 @@ SPH_API SPHStringBuffer *SPH_string_buffer_init(SPHStringBuffer *self) {
     self->size     = DEFAULT_BUFFER_SIZE;
     self->position =   0;
     self->buffer   = SPH_NEW_ARRAY( self->size );
+
+    return self;
 }
 
 SPH_API SPHStringBuffer *SPH_string_buffer_new(void) {
@@ -78,7 +83,7 @@ SPH_API void SPH_string_buffer_append_string(SPHStringBuffer *self, const char *
 
     length = strlen( str );
 
-    string_buffer_ensure( self, len + 1 );
+    string_buffer_ensure( self, length + 1 );
 
     memcpy( self->buffer + self->position, str, length );
 
