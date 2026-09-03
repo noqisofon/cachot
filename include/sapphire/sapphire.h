@@ -10,3 +10,4 @@
 #include "sapphire/io_path.h"
 #include "sapphire/io_handle.h"
 #include "sapphire/error.h"
+#include "sapphire/posix.h"

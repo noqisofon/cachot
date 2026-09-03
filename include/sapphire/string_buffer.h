@@ -1,5 +1,8 @@
 #pragma once
 
+#include <stddef.h>
+
+#include "sapphire/internal.h"
 
 /*!
  *

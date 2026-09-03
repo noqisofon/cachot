@@ -1,5 +1,9 @@
 #pragma once
 
+#include <stdint.h>
+
+#include "sapphire/internal.h"
+#include "sapphire/str.h"
 
 // SPH_EXTERN_C_BEGIN
 
@@ -35,7 +39,7 @@ SPH_API int32_t       SPH_get_fmode(void);
 /*!
  *
  */
-SPH_API int32_t       SPH_note(const SPHStr format, ...);
+SPH_API int32_t       SPH_note(const char *format, ...);
 
 
 // SPH_EXTERN_C_END

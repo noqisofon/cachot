@@ -1,5 +1,11 @@
 #pragma once
 
+#include <stddef.h>
+#include <stdint.h>
+
+#include "sapphire/internal.h"
+#include "sapphire/boolean.h"
+
 typedef char *SPHStr;
 typedef char *SPHStrIterator;
 

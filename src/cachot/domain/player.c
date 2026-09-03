@@ -24,7 +24,7 @@ CCH_API void CCH_player_enter_spawn_point(CCHObject *a_player) {
 
     tmp = CCH_object_new();
 
-    CCH_OBJECT_EXIT_PATH(tmp) = SPH_share_string_append( a_player->controller->spawn_map_name );
+    CCH_OBJECT_EXIT_PATH(tmp) = SPH_str_clone( a_player->controller->spawn_map_name );
     CCH_OBJECT_EXIT_X(tmp)    = a_player->controller->spawn_x;
     CCH_OBJECT_EXIT_Y(tmp)    = a_player->controller->spawn_y;
 
@@ -41,7 +41,7 @@ CCH_API void CCH_player_enter_spawn_point(CCHObject *a_player) {
         a_player->controller->spawn_x = The_settings.emergency_x;
         a_player->controller->spawn_y = The_settings.emergency_y;
 
-        CCH_OBJECT_EXIT_PATH(tmp) = SPH_share_string_append( a_player->controller->spawn_map_name );
+        CCH_OBJECT_EXIT_PATH(tmp) = SPH_str_clone( a_player->controller->spawn_map_name );
         CCH_OBJECT_EXIT_X(tmp)    = a_player->controller->spawn_x;
         CCH_OBJECT_EXIT_Y(tmp)    = a_player->controller->spawn_y;
 

@@ -16,7 +16,7 @@
 #   include <unistd.h>
 #endif  /* def HAVE_UNISTD_H */
 
-#include "sappire/posix.h"
+#include "sapphire/posix.h"
 
 
 SPH_API SPHuser_id_t SPH_get_user_id(void) {

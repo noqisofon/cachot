@@ -20,6 +20,10 @@
 #    include <assert.h>
 #endif /* def HAVE_ASSERT_H */
 
+#include <stdio.h>
+#include <stdlib.h>
+#include <string.h>
+
 #include "cachot/cachot.h"
 #include "cachot/client.h"
 #include "cachot/version.h"
@@ -238,8 +242,7 @@ static void enter_map( CCHObject *moving_player, CCHMap *next_map, int32_t x, in
                                                   x + Free_area_x[i],
                                                   y + +Free_area_x[i] );
             moving_player->controller->ranges[CCH_RANGE_GOREM]->direction =
-                CCH_object_find_dir2( moving_player->x_object->controller->[RANGE_GOREM] -> x,
-                                      moving_player -> x_object -> controller -> [RANGE_GOREM] -> y );
+                CCH_object_find_dir2( moving_player, moving_player->controller->ranges[CCH_RANGE_GOREM] );
         }
     }
     moving_player->direction = 0;
@@ -342,7 +345,7 @@ CCH_API void CCH_server_dispatch_event( void ) {
         /*
          *
          */
-        if ( CCH_OBJECT_QUERY_FLAG( that, CCH_FLAG_REMOVED ) && that->type != CCH_OBJECT_TYPE_PLAYER && that->map &&
+        if ( CCH_OBJECT_QUERY_FLAG( that, CCH_OBJECT_FLAG_REMOVED ) && that->type != CCH_OBJECT_TYPE_PLAYER && that->map &&
              that->map->in_memory != CCH_MAP_IN_MEMORY ) {
             SPHStringBuffer *buffer;
             char            *diff;
@@ -355,7 +358,7 @@ CCH_API void CCH_server_dispatch_event( void ) {
             CCH_ERROR( _( "%s\n" ), diff );
 
             free( diff );
-            CCH_object_free2( that, CCH_OBJECT_FREE_NO_DESTROY_CALLBACK );
+            CCH_object_free2( that, CCH_OBJECT_FREETYPE_NO_DESTROY_CALLBACK );
 
             continue;
         }
@@ -435,12 +438,12 @@ CCH_API void CCH_server_dispatch_event( void ) {
 static void perform_specials( void ) {
     uint32_t tick = CCH_time_ticks();
 
-    if ( !( ticks % 10 ) ) {
+    if ( !( tick % 10 ) ) {
         CCH_knowledge_incremental();
     }
 
 #ifdef CCH_ALLOW_WATCHDOG
-    if ( !( ticks % 503 ) ) {
+    if ( !( tick % 503 ) ) {
         CCH_watchdog();
     }
 #endif /* def CCH_ALLOW_WATCHDOG */

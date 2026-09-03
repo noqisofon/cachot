@@ -12,13 +12,17 @@
 #include <fcntl.h>
 #include <stdlib.h>
 #include <stdarg.h>
+#include <stdio.h>
+
+#include "sapphire/io.h"
 
 
-void SPH_set_fmode(int32_t mode) {
+SPH_API void SPH_set_fmode(int32_t mode) {
 #ifdef _MSC_VER
     _set_fmode( mode );
 #else
-    _fmode = mode;
+    // POSIX にはテキスト/バイナリモードの区別が無いので、何もしません。
+    (void)mode;
 #endif  /* def _MSC_VER */
 }
 
@@ -26,8 +30,6 @@ SPH_API int32_t SPH_get_fmode(void) {
     int32_t mode = 0;
 #ifdef _MSC_VER
     _get_fmode( &mode );
-#else
-    mode = _fmode;
 #endif  /* def _MSC_VER */
     return mode;
 }
